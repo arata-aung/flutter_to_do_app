@@ -21,8 +21,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       // title: 'Flutter Demo',
       // home: const MyHomePage(title: 'Flutter Demo Home Page'),
-      // home: HomePage(),
-      home: LoginPage(),
+      home: HomePage(),
+      // home: LoginPage(),
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
           // This is the theme of your application.
