@@ -45,10 +45,12 @@ class _DialogBoxState extends State<DialogBox> {
 
   @override
   Widget build(BuildContext context) {
+    const double dialogHeight = 260; // Height for dialog content
+    
     return AlertDialog(
       backgroundColor: Colors.yellow[300],
       content: SizedBox(
-        height: 240,
+        height: dialogHeight,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
