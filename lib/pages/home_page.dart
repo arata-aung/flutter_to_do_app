@@ -15,21 +15,17 @@ class _HomePageState extends State<HomePage> {
   final _myBox = Hive.box('mybox');
   ToDoDatabase db = ToDoDatabase();
 
+  @override
   void initState() {
+    super.initState();
     if (_myBox.get("TODOLIST") == null) {
       db.createInitialData();
     } else {
       db.loadData();
     }
-    super.initState();
   }
 
   final _controller = TextEditingController();
-  // list of todo tasks
-  // List toDoList = [
-  //   ["Make Tutorial", false],
-  //   ["Do Exercise", false],
-  // ];
 
   void checkBoxChanged(bool? value, int index) {
     setState(() {
@@ -39,11 +35,15 @@ class _HomePageState extends State<HomePage> {
   }
 
   void saveNewTask() {
+    if (_controller.text.trim().isEmpty) {
+      return;
+    }
     setState(() {
       db.toDoList.add([
         _controller.text,
         false,
       ]);
+      _controller.clear();
     });
     Navigator.of(context).pop();
     db.updateDatabase();
@@ -74,12 +74,12 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       backgroundColor: Colors.yellow[200],
       appBar: AppBar(
-        title: Text("To Do"),
+        title: const Text("To Do"),
         elevation: 0,
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: createNewTask,
-        child: Icon(Icons.add),
+        child: const Icon(Icons.add),
       ),
       body: ListView.builder(
         itemCount: db.toDoList.length,
@@ -92,20 +92,6 @@ class _HomePageState extends State<HomePage> {
           );
         },
       ),
-      // body: ListView(
-      //   children: [
-      //     ToDoTile(
-      //       taskName: "Testing",
-      //       taskCompleted: true,
-      //       onChanged: (p0) {},
-      //     ),
-      //     ToDoTile(
-      //       taskName: "Exercise",
-      //       taskCompleted: false,
-      //       onChanged: (p0) {},
-      //     ),
-      //   ],
-      // ),
     );
   }
 }
