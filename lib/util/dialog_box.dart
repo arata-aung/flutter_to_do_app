@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:to_do_app/util/my_button.dart';
+import 'package:to_do_app/util/color_utils.dart';
 
 class DialogBox extends StatefulWidget {
   final TextEditingController controller;
@@ -19,32 +20,6 @@ class DialogBox extends StatefulWidget {
 
 class _DialogBoxState extends State<DialogBox> {
   String selectedColor = "yellow";
-
-  Color getColorFromString(String colorName) {
-    switch (colorName.toLowerCase()) {
-      case 'red':
-        return Colors.red;
-      case 'blue':
-        return Colors.blue;
-      case 'green':
-        return Colors.green;
-      case 'orange':
-        return Colors.orange;
-      case 'purple':
-        return Colors.purple;
-      case 'pink':
-        return Colors.pink;
-      case 'teal':
-        return Colors.teal;
-      case 'cyan':
-        return Colors.cyan;
-      case 'amber':
-        return Colors.amber;
-      case 'yellow':
-      default:
-        return Colors.yellow;
-    }
-  }
 
   Widget _buildColorOption(String colorName, Color color) {
     return GestureDetector(
@@ -73,7 +48,7 @@ class _DialogBoxState extends State<DialogBox> {
     return AlertDialog(
       backgroundColor: Colors.yellow[300],
       content: SizedBox(
-        height: 220,
+        height: 240,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
@@ -89,16 +64,12 @@ class _DialogBoxState extends State<DialogBox> {
             Wrap(
               spacing: 8,
               runSpacing: 8,
-              children: [
-                _buildColorOption('yellow', Colors.yellow),
-                _buildColorOption('red', Colors.red),
-                _buildColorOption('blue', Colors.blue),
-                _buildColorOption('green', Colors.green),
-                _buildColorOption('orange', Colors.orange),
-                _buildColorOption('purple', Colors.purple),
-                _buildColorOption('pink', Colors.pink),
-                _buildColorOption('teal', Colors.teal),
-              ],
+              children: availableColors
+                  .map((colorData) => _buildColorOption(
+                        colorData['name'] as String,
+                        colorData['color'] as Color,
+                      ))
+                  .toList(),
             ),
             const SizedBox(height: 10),
             Row(

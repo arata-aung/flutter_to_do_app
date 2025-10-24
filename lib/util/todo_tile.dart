@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:to_do_app/util/color_utils.dart';
 
 class ToDoTile extends StatelessWidget {
   final String taskName;
@@ -21,35 +22,8 @@ class ToDoTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Helper function to get Color from string
-    Color getColorFromString(String colorName) {
-      switch (colorName.toLowerCase()) {
-        case 'red':
-          return Colors.red;
-        case 'blue':
-          return Colors.blue;
-        case 'green':
-          return Colors.green;
-        case 'orange':
-          return Colors.orange;
-        case 'purple':
-          return Colors.purple;
-        case 'pink':
-          return Colors.pink;
-        case 'teal':
-          return Colors.teal;
-        case 'cyan':
-          return Colors.cyan;
-        case 'amber':
-          return Colors.amber;
-        case 'yellow':
-        default:
-          return Colors.yellow;
-      }
-    }
-
     // Helper function to build a color option
-    Widget _buildColorOption(BuildContext dialogContext, String colorName, Color color) {
+    Widget buildColorOption(BuildContext dialogContext, String colorName, Color color) {
       return GestureDetector(
         onTap: () {
           if (onColorChanged != null) {
@@ -89,18 +63,13 @@ class ToDoTile extends StatelessWidget {
                       content: Wrap(
                         spacing: 10,
                         runSpacing: 10,
-                        children: [
-                          _buildColorOption(dialogContext, 'yellow', Colors.yellow),
-                          _buildColorOption(dialogContext, 'red', Colors.red),
-                          _buildColorOption(dialogContext, 'blue', Colors.blue),
-                          _buildColorOption(dialogContext, 'green', Colors.green),
-                          _buildColorOption(dialogContext, 'orange', Colors.orange),
-                          _buildColorOption(dialogContext, 'purple', Colors.purple),
-                          _buildColorOption(dialogContext, 'pink', Colors.pink),
-                          _buildColorOption(dialogContext, 'teal', Colors.teal),
-                          _buildColorOption(dialogContext, 'cyan', Colors.cyan),
-                          _buildColorOption(dialogContext, 'amber', Colors.amber),
-                        ],
+                        children: availableColors
+                            .map((colorData) => buildColorOption(
+                                  dialogContext,
+                                  colorData['name'] as String,
+                                  colorData['color'] as Color,
+                                ))
+                            .toList(),
                       ),
                     );
                   },
