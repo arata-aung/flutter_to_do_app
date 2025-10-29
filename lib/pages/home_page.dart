@@ -34,7 +34,7 @@ class _HomePageState extends State<HomePage> {
     db.updateDatabase();
   }
 
-  void saveNewTask() {
+  void saveNewTask(String color) {
     if (_controller.text.trim().isEmpty) {
       return;
     }
@@ -42,6 +42,7 @@ class _HomePageState extends State<HomePage> {
       db.toDoList.add([
         _controller.text,
         false,
+        color,
       ]);
       _controller.clear();
     });
@@ -69,6 +70,13 @@ class _HomePageState extends State<HomePage> {
     db.updateDatabase();
   }
 
+  void changeTaskColor(int index, String newColor) {
+    setState(() {
+      db.toDoList[index][2] = newColor;
+    });
+    db.updateDatabase();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -87,8 +95,12 @@ class _HomePageState extends State<HomePage> {
           return ToDoTile(
             taskName: db.toDoList[index][0],
             taskCompleted: db.toDoList[index][1],
+            taskColor: db.toDoList[index].length > 2 
+                ? db.toDoList[index][2] 
+                : "yellow",
             onChanged: (value) => checkBoxChanged(value, index),
             deleteFunction: (context) => deleteTask(index),
+            onColorChanged: (color) => changeTaskColor(index, color),
           );
         },
       ),
