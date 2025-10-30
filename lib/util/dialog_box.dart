@@ -45,24 +45,44 @@ class _DialogBoxState extends State<DialogBox> {
 
   @override
   Widget build(BuildContext context) {
-    const double dialogHeight = 260; // Height for dialog content
-    
     return AlertDialog(
-      backgroundColor: Colors.yellow[300],
-      content: SizedBox(
-        height: dialogHeight,
+      backgroundColor: Colors.blue.shade50,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+      ),
+      title: const Text(
+        "Add New Task",
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+          fontSize: 20,
+        ),
+      ),
+      content: SingleChildScrollView(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             TextField(
               controller: widget.controller,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                hintText: "Add a new task",
+              decoration: InputDecoration(
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                hintText: "Enter task name",
+                filled: true,
+                fillColor: Colors.white,
+                prefixIcon: const Icon(Icons.task_alt),
               ),
             ),
-            const SizedBox(height: 10),
-            const Text("Choose Color:"),
+            const SizedBox(height: 16),
+            const Text(
+              "Choose Color:",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
+            ),
+            const SizedBox(height: 8),
             Wrap(
               spacing: 8,
               runSpacing: 8,
@@ -73,22 +93,16 @@ class _DialogBoxState extends State<DialogBox> {
                       ))
                   .toList(),
             ),
-            const SizedBox(height: 10),
-            Row(
-              children: [
-                MyButton(
-                  text: "Save",
-                  onPressed: () => widget.onSave(selectedColor),
-                ),
-                const SizedBox(
-                  width: 8,
-                ),
-                MyButton(text: "Cancel", onPressed: widget.onCancel),
-              ],
-            )
           ],
         ),
       ),
+      actions: [
+        MyButton(
+          text: "Save",
+          onPressed: () => widget.onSave(selectedColor),
+        ),
+        MyButton(text: "Cancel", onPressed: widget.onCancel),
+      ],
     );
   }
 }
