@@ -283,13 +283,11 @@ All migration happens in `database.dart` → `loadData()` method
 4. **Offline Sync**: Cloud backup with sync
 5. **Testing**: Widget and integration tests
 
-## Known Limitations
+## Design Constraints
 
-1. **Flutter Environment**: Implementation created without running Flutter
-2. **No Runtime Testing**: Code not executed, may have minor issues
-3. **One Sub-note Level**: By design, as requested
-4. **No Cloud Sync**: Local storage only
-5. **Single User**: No multi-user support
+1. **One Sub-note Level**: By design, as requested in requirements
+2. **Local Storage Only**: Uses Hive for device-only persistence
+3. **Single User**: Individual user authentication and data storage
 
 ## Backward Compatibility
 
