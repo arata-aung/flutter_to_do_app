@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:to_do_app/data/auth_service.dart';
 import 'package:to_do_app/data/database.dart';
+import 'package:to_do_app/pages/login_page.dart';
 import 'package:to_do_app/util/dialog_box.dart';
 import 'package:to_do_app/util/todo_tile.dart';
 
@@ -14,6 +16,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final _myBox = Hive.box('mybox');
   ToDoDatabase db = ToDoDatabase();
+  final _authService = AuthService();
 
   @override
   void initState() {
@@ -77,13 +80,31 @@ class _HomePageState extends State<HomePage> {
     db.updateDatabase();
   }
 
+  void _logout() async {
+    await _authService.logout();
+    if (mounted) {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => const LoginPage()),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final currentUser = _authService.getCurrentUser();
+    
     return Scaffold(
       backgroundColor: Colors.yellow[200],
       appBar: AppBar(
-        title: const Text("To Do"),
+        title: Text("To Do${currentUser != null ? ' - $currentUser' : ''}"),
         elevation: 0,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: _logout,
+            tooltip: 'Logout',
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: createNewTask,

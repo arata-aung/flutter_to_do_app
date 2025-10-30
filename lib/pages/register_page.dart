@@ -1,30 +1,41 @@
 import 'package:flutter/material.dart';
 import 'package:to_do_app/data/auth_service.dart';
 import 'package:to_do_app/pages/home_page.dart';
-import 'package:to_do_app/pages/register_page.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+class RegisterPage extends StatefulWidget {
+  const RegisterPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<RegisterPage> createState() => _RegisterPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _RegisterPageState extends State<RegisterPage> {
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
   final _authService = AuthService();
 
-  void _login() async {
+  void _register() async {
     final username = _usernameController.text.trim();
     final password = _passwordController.text.trim();
+    final confirmPassword = _confirmPasswordController.text.trim();
 
     if (username.isEmpty || password.isEmpty) {
       _showMessage('Please fill in all fields');
       return;
     }
 
-    final success = _authService.login(username, password);
+    if (password != confirmPassword) {
+      _showMessage('Passwords do not match');
+      return;
+    }
+
+    if (password.length < 4) {
+      _showMessage('Password must be at least 4 characters');
+      return;
+    }
+
+    final success = await _authService.register(username, password);
     if (success) {
       await _authService.setCurrentUser(username);
       if (mounted) {
@@ -33,7 +44,7 @@ class _LoginPageState extends State<LoginPage> {
         );
       }
     } else {
-      _showMessage('Invalid username or password');
+      _showMessage('Username already exists');
     }
   }
 
@@ -47,6 +58,7 @@ class _LoginPageState extends State<LoginPage> {
   void dispose() {
     _usernameController.dispose();
     _passwordController.dispose();
+    _confirmPasswordController.dispose();
     super.dispose();
   }
 
@@ -62,12 +74,12 @@ class _LoginPageState extends State<LoginPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const Icon(
-                  Icons.lock,
+                  Icons.person_add,
                   size: 100,
                 ),
                 const SizedBox(height: 50),
                 Text(
-                  'Welcome back',
+                  'Create Account',
                   style: TextStyle(
                     color: Colors.grey[700],
                     fontSize: 20,
@@ -108,9 +120,27 @@ class _LoginPageState extends State<LoginPage> {
                     hintText: 'Password',
                   ),
                 ),
+                const SizedBox(height: 10),
+                TextField(
+                  controller: _confirmPasswordController,
+                  obscureText: true,
+                  decoration: InputDecoration(
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: const BorderSide(color: Colors.white),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.grey.shade400),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    fillColor: Colors.grey.shade200,
+                    filled: true,
+                    hintText: 'Confirm Password',
+                  ),
+                ),
                 const SizedBox(height: 25),
                 GestureDetector(
-                  onTap: _login,
+                  onTap: _register,
                   child: Container(
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
@@ -119,7 +149,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     child: const Center(
                       child: Text(
-                        'Login',
+                        'Register',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 18,
@@ -133,19 +163,13 @@ class _LoginPageState extends State<LoginPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      'Don\'t have an account? ',
+                      'Already have an account? ',
                       style: TextStyle(color: Colors.grey[700]),
                     ),
                     GestureDetector(
-                      onTap: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) => const RegisterPage(),
-                          ),
-                        );
-                      },
+                      onTap: () => Navigator.of(context).pop(),
                       child: const Text(
-                        'Register here',
+                        'Login here',
                         style: TextStyle(
                           color: Colors.blue,
                           fontWeight: FontWeight.bold,
