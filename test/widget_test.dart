@@ -16,14 +16,16 @@ void main() {
     await Hive.initFlutter();
   });
 
-  testWidgets('App loads with HomePage', (WidgetTester tester) async {
+  testWidgets('App loads with LoginPage when not logged in', (WidgetTester tester) async {
+    // Open Hive box for testing
+    await Hive.openBox('mybox');
+    
     // Build our app and trigger a frame.
     await tester.pumpWidget(const MyApp());
 
-    // Verify that HomePage is loaded with "To Do" title
-    expect(find.text('To Do'), findsOneWidget);
-    
-    // Verify the FAB is present
-    expect(find.byIcon(Icons.add), findsOneWidget);
+    // Verify that LoginPage is loaded
+    expect(find.text('Welcome back'), findsOneWidget);
+    expect(find.text('Login'), findsOneWidget);
+    expect(find.byIcon(Icons.lock), findsOneWidget);
   });
 }
