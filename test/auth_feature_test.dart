@@ -57,8 +57,9 @@ void main() {
       expect(result, false);
     });
 
-    test('login succeeds with correct credentials', () async {
+    test('login validates correct credentials', () async {
       await authService.register('testuser', 'password123');
+      // Note: login() only validates credentials, setCurrentUser() must be called separately
       final result = authService.login('testuser', 'password123');
       expect(result, true);
     });
@@ -125,12 +126,14 @@ void main() {
       expect(usersMap['user3'], 'pass3');
     });
 
-    test('each user can login independently', () async {
+    test('each user credentials are validated independently', () async {
       await authService.register('user1', 'pass1');
       await authService.register('user2', 'pass2');
       
+      // Verify each user can be authenticated with their own password
       expect(authService.login('user1', 'pass1'), true);
       expect(authService.login('user2', 'pass2'), true);
+      // Verify cross-authentication fails
       expect(authService.login('user1', 'pass2'), false);
       expect(authService.login('user2', 'pass1'), false);
     });
