@@ -16,6 +16,7 @@ class ToDoTile extends StatefulWidget {
   final Function(int, String)? onSubNoteColorChanged;
   final Function()? onMoveTask;
   final Function(int)? onMoveSubNote;
+  final Function(int, int)? onReorderSubNotes;
   final DateTime? dueDate;
   final TimeOfDay? dueTime;
   final Function()? onEditDateTime;
@@ -36,6 +37,7 @@ class ToDoTile extends StatefulWidget {
     this.onSubNoteColorChanged,
     this.onMoveTask,
     this.onMoveSubNote,
+    this.onReorderSubNotes,
     this.dueDate,
     this.dueTime,
     this.onEditDateTime,
@@ -415,6 +417,7 @@ class _ToDoTileState extends State<ToDoTile> {
               final subNoteColor = subNote['color'] ?? 'yellow';
               
               return Padding(
+                key: ValueKey('subnote_$index'),
                 padding: const EdgeInsets.only(left: 40, top: 8),
                 child: Container(
                   padding: const EdgeInsets.all(12),
@@ -435,6 +438,10 @@ class _ToDoTileState extends State<ToDoTile> {
                   ),
                   child: Row(
                     children: [
+                      if (widget.onReorderSubNotes != null)
+                        Icon(Icons.drag_handle, color: Colors.grey[600], size: 18),
+                      if (widget.onReorderSubNotes != null)
+                        const SizedBox(width: 8),
                       SizedBox(
                         width: 20,
                         height: 20,

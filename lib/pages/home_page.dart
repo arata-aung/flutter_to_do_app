@@ -446,6 +446,17 @@ class _HomePageState extends State<HomePage> {
     db.updateDatabase();
   }
 
+  void reorderSubNotes(int taskIndex, int oldIndex, int newIndex) {
+    setState(() {
+      if (newIndex > oldIndex) {
+        newIndex -= 1;
+      }
+      final subNote = db.toDoList[taskIndex]['subNotes'].removeAt(oldIndex);
+      db.toDoList[taskIndex]['subNotes'].insert(newIndex, subNote);
+    });
+    db.updateDatabase();
+  }
+
   void toggleGroupExpansion(int groupIndex) {
     setState(() {
       db.groups[groupIndex]['expanded'] = !db.groups[groupIndex]['expanded'];
@@ -936,6 +947,7 @@ class _HomePageState extends State<HomePage> {
                 onSubNoteColorChanged: (subIdx, color) => changeSubNoteColor(i, subIdx, color),
                 onMoveTask: null,  // No groups, can't move
                 onMoveSubNote: (subIdx) => showMoveSubNoteDialog(i, subIdx),
+                onReorderSubNotes: (oldIdx, newIdx) => reorderSubNotes(i, oldIdx, newIdx),
                 onEditDateTime: () => editTaskDateTime(i),
               ),
             ),
@@ -990,6 +1002,7 @@ class _HomePageState extends State<HomePage> {
                     onSubNoteColorChanged: (subIdx, color) => changeSubNoteColor(i, subIdx, color),
                     onMoveTask: () => showMoveTaskDialog(i),
                     onMoveSubNote: (subIdx) => showMoveSubNoteDialog(i, subIdx),
+                    onReorderSubNotes: (oldIdx, newIdx) => reorderSubNotes(i, oldIdx, newIdx),
                     onEditDateTime: () => editTaskDateTime(i),
                   ),
                 ),
