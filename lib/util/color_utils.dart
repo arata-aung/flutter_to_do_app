@@ -21,3 +21,8 @@ Color getColorFromString(String colorName) {
   };
   return colorMap[colorName.toLowerCase()] ?? Colors.yellow;
 }
+
+// Get list of color names
+List<String> getAvailableColorNames() {
+  return availableColors.map((item) => item['name'] as String).toList();
+}

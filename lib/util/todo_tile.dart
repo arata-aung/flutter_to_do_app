@@ -13,6 +13,9 @@ class ToDoTile extends StatefulWidget {
   final Function(String)? onAddSubNote;
   final Function(int, bool)? onSubNoteChanged;
   final Function(int)? onDeleteSubNote;
+  final Function(int, String)? onSubNoteColorChanged;
+  final Function()? onMoveTask;
+  final Function(int)? onMoveSubNote;
 
   const ToDoTile({
     super.key,
@@ -26,6 +29,9 @@ class ToDoTile extends StatefulWidget {
     this.onAddSubNote,
     this.onSubNoteChanged,
     this.onDeleteSubNote,
+    this.onSubNoteColorChanged,
+    this.onMoveTask,
+    this.onMoveSubNote,
   });
 
   @override
@@ -141,6 +147,13 @@ class _ToDoTileState extends State<ToDoTile> {
                   backgroundColor: Colors.blue.shade300,
                   borderRadius: BorderRadius.circular(12),
                 ),
+                if (widget.onMoveTask != null)
+                  SlidableAction(
+                    onPressed: (context) => widget.onMoveTask!(),
+                    icon: Icons.drive_file_move,
+                    backgroundColor: Colors.orange.shade300,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 SlidableAction(
                   onPressed: widget.deleteFunction,
                   icon: Icons.delete,
@@ -251,16 +264,24 @@ class _ToDoTileState extends State<ToDoTile> {
               final subNote = entry.value;
               final name = subNote['name'] ?? '';
               final completed = subNote['completed'] ?? false;
+              final subNoteColor = subNote['color'] ?? 'yellow';
               
               return Padding(
                 padding: const EdgeInsets.only(left: 40, top: 8),
                 child: Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.7),
+                    gradient: LinearGradient(
+                      colors: [
+                        getColorFromString(subNoteColor).withOpacity(0.5),
+                        getColorFromString(subNoteColor).withOpacity(0.3),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: getColorFromString(widget.taskColor).withOpacity(0.3),
+                      color: getColorFromString(subNoteColor).withOpacity(0.5),
                       width: 2,
                     ),
                   ),
@@ -292,6 +313,64 @@ class _ToDoTileState extends State<ToDoTile> {
                           ),
                         ),
                       ),
+                      if (widget.onSubNoteColorChanged != null)
+                        IconButton(
+                          icon: const Icon(Icons.palette, size: 18),
+                          onPressed: () {
+                            // Show color picker for sub-note
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext dialogContext) {
+                                return AlertDialog(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  title: const Text('Choose Sub-note Color'),
+                                  content: Wrap(
+                                    spacing: 10,
+                                    runSpacing: 10,
+                                    children: availableColors
+                                        .map((colorData) => GestureDetector(
+                                              onTap: () {
+                                                widget.onSubNoteColorChanged!(
+                                                  index,
+                                                  colorData['name'] as String,
+                                                );
+                                                Navigator.of(dialogContext).pop();
+                                              },
+                                              child: Container(
+                                                width: 50,
+                                                height: 50,
+                                                decoration: BoxDecoration(
+                                                  color: colorData['color'] as Color,
+                                                  shape: BoxShape.circle,
+                                                  border: Border.all(
+                                                    color: subNoteColor == colorData['name']
+                                                        ? Colors.black
+                                                        : Colors.grey,
+                                                    width: subNoteColor == colorData['name'] ? 3 : 1,
+                                                  ),
+                                                ),
+                                              ),
+                                            ))
+                                        .toList(),
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                          color: Colors.blue.shade600,
+                        ),
+                      if (widget.onMoveSubNote != null)
+                        IconButton(
+                          icon: const Icon(Icons.drive_file_move, size: 18),
+                          onPressed: () => widget.onMoveSubNote!(index),
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                          color: Colors.orange.shade600,
+                        ),
                       IconButton(
                         icon: const Icon(Icons.close, size: 18),
                         onPressed: () {
