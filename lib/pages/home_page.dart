@@ -48,7 +48,7 @@ class _HomePageState extends State<HomePage> {
     db.updateDatabase();
   }
 
-  void saveNewTask(String color) {
+  void saveNewTask(String color, DateTime? dueDate, TimeOfDay? dueTime) {
     if (_controller.text.trim().isEmpty) {
       return;
     }
@@ -59,6 +59,8 @@ class _HomePageState extends State<HomePage> {
         'color': color,
         'groupIndex': selectedGroupIndex ?? (db.groups.isNotEmpty ? 0 : -1),
         'subNotes': [],
+        'dueDate': dueDate?.toIso8601String(),
+        'dueTime': dueTime != null ? _formatTimeOfDay(dueTime) : null,
       });
       _controller.clear();
     });
@@ -170,6 +172,163 @@ class _HomePageState extends State<HomePage> {
       }
     });
     db.updateDatabase();
+  }
+
+  TimeOfDay? _parseTimeOfDay(String? timeString) {
+    if (timeString == null) return null;
+    try {
+      final parts = timeString.split(':');
+      if (parts.length != 2) return null;
+      final hour = int.parse(parts[0]);
+      final minute = int.parse(parts[1]);
+      if (hour < 0 || hour > 23 || minute < 0 || minute > 59) return null;
+      return TimeOfDay(hour: hour, minute: minute);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  String _formatTimeOfDay(TimeOfDay time) {
+    return '${time.hour}:${time.minute.toString().padLeft(2, '0')}';
+  }
+
+  DateTime? _parseDateTimeSafe(String? dateString) {
+    if (dateString == null) return null;
+    try {
+      return DateTime.parse(dateString);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  void editTaskDateTime(int taskIndex) {
+    final task = db.toDoList[taskIndex];
+    DateTime? currentDate = _parseDateTimeSafe(task['dueDate']);
+    TimeOfDay? currentTime = _parseTimeOfDay(task['dueTime']);
+    
+    showDialog(
+      context: context,
+      builder: (context) {
+        DateTime? selectedDate = currentDate;
+        TimeOfDay? selectedTime = currentTime;
+        
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            Future<void> selectDate() async {
+              final DateTime? picked = await showDatePicker(
+                context: context,
+                initialDate: selectedDate ?? DateTime.now(),
+                firstDate: DateTime(2000),
+                lastDate: DateTime(2100),
+              );
+              if (picked != null) {
+                setDialogState(() {
+                  selectedDate = picked;
+                });
+              }
+            }
+
+            Future<void> selectTime() async {
+              final TimeOfDay? picked = await showTimePicker(
+                context: context,
+                initialTime: selectedTime ?? TimeOfDay.now(),
+              );
+              if (picked != null) {
+                setDialogState(() {
+                  selectedTime = picked;
+                });
+              }
+            }
+            
+            return AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              title: const Text('Edit Due Date & Time'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: selectDate,
+                          icon: const Icon(Icons.calendar_today),
+                          label: Text(
+                            selectedDate != null
+                                ? '${selectedDate!.month}/${selectedDate!.day}/${selectedDate!.year}'
+                                : 'Select Date',
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      if (selectedDate != null)
+                        IconButton(
+                          icon: const Icon(Icons.close),
+                          onPressed: () {
+                            setDialogState(() {
+                              selectedDate = null;
+                              selectedTime = null;
+                            });
+                          },
+                          tooltip: 'Clear date',
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  if (selectedDate != null)
+                    Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton.icon(
+                            onPressed: selectTime,
+                            icon: const Icon(Icons.access_time),
+                            label: Text(
+                              selectedTime != null
+                                  ? selectedTime!.format(context)
+                                  : 'Select Time (optional)',
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        if (selectedTime != null)
+                          IconButton(
+                            icon: const Icon(Icons.close),
+                            onPressed: () {
+                              setDialogState(() {
+                                selectedTime = null;
+                              });
+                            },
+                            tooltip: 'Clear time',
+                          ),
+                      ],
+                    ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('Cancel'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      db.toDoList[taskIndex]['dueDate'] = selectedDate?.toIso8601String();
+                      db.toDoList[taskIndex]['dueTime'] = selectedTime != null 
+                          ? _formatTimeOfDay(selectedTime!) 
+                          : null;
+                    });
+                    db.updateDatabase();
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('Save'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
   }
 
   void moveTaskToGroup(int taskIndex, int targetGroupIndex) {
@@ -608,6 +767,8 @@ class _HomePageState extends State<HomePage> {
               taskCompleted: task['completed'] ?? false,
               taskColor: task['color'] ?? 'yellow',
               subNotes: task['subNotes'] ?? [],
+              dueDate: _parseDateTimeSafe(task['dueDate']),
+              dueTime: _parseTimeOfDay(task['dueTime']),
               onChanged: (value) => checkBoxChanged(value, i),
               deleteFunction: (context) => deleteTask(i),
               onColorChanged: (color) => changeTaskColor(i, color),
@@ -617,6 +778,7 @@ class _HomePageState extends State<HomePage> {
               onSubNoteColorChanged: (subIdx, color) => changeSubNoteColor(i, subIdx, color),
               onMoveTask: null,  // No groups, can't move
               onMoveSubNote: (subIdx) => showMoveSubNoteDialog(i, subIdx),
+              onEditDateTime: () => editTaskDateTime(i),
             ),
           );
         }
@@ -650,6 +812,8 @@ class _HomePageState extends State<HomePage> {
                   taskCompleted: task['completed'] ?? false,
                   taskColor: task['color'] ?? 'yellow',
                   subNotes: task['subNotes'] ?? [],
+                  dueDate: _parseDateTimeSafe(task['dueDate']),
+                  dueTime: _parseTimeOfDay(task['dueTime']),
                   onChanged: (value) => checkBoxChanged(value, i),
                   deleteFunction: (context) => deleteTask(i),
                   onColorChanged: (color) => changeTaskColor(i, color),
@@ -659,6 +823,7 @@ class _HomePageState extends State<HomePage> {
                   onSubNoteColorChanged: (subIdx, color) => changeSubNoteColor(i, subIdx, color),
                   onMoveTask: () => showMoveTaskDialog(i),
                   onMoveSubNote: (subIdx) => showMoveSubNoteDialog(i, subIdx),
+                  onEditDateTime: () => editTaskDateTime(i),
                 ),
               );
             }

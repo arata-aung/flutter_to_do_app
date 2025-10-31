@@ -14,6 +14,8 @@ A modern Flutter to-do list application with groups, sub-notes, and beautiful UI
 - Create and manage to-do tasks
 - Mark tasks as complete/incomplete
 - Delete tasks with swipe gesture
+- **Date & Time** - Set due dates and times for tasks (similar to Google Tasks)
+- **Overdue indicators** - Visual highlighting for overdue tasks
 - **Sub-notes** - Add one level of sub-tasks to any task
 - Assign tasks to groups
 - **Customize task colors** - Choose from 10 different colors for each task
@@ -64,7 +66,9 @@ A modern Flutter to-do list application with groups, sub-notes, and beautiful UI
 2. Select which group to add the task to (if multiple groups exist)
 3. Enter your task name
 4. Select a color from the color picker
-5. Tap "Save"
+5. (Optional) Set a due date by tapping "Select Date"
+6. (Optional) If date is set, you can also set a time by tapping "Select Time"
+7. Tap "Save"
 
 **Add Sub-notes:**
 1. Click the + button on any task
@@ -79,6 +83,20 @@ A modern Flutter to-do list application with groups, sub-notes, and beautiful UI
 **Expand/Collapse Sub-notes:**
 - If a task has sub-notes, a badge shows the count
 - Tap the expand/collapse icon to show or hide sub-notes
+
+**Set or Edit Due Date & Time:**
+1. Swipe left on any task
+2. Tap the calendar icon (📅)
+3. Select a due date from the calendar picker
+4. (Optional) Select a time from the time picker
+5. Tap "Save"
+6. To clear date/time, tap the X button next to the date or time field
+
+**View Due Dates:**
+- Tasks with due dates show a calendar icon and date below the task name
+- Tasks due today are labeled "Today"
+- **Overdue tasks** are highlighted with a red background and border
+- You can also tap directly on the displayed date/time to edit it
 
 **Change Task Color:**
 1. Swipe left on any existing task
