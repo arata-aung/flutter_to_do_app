@@ -192,22 +192,19 @@ class _HomePageState extends State<HomePage> {
     return '${time.hour}:${time.minute.toString().padLeft(2, '0')}';
   }
 
+  DateTime? _parseDateTimeSafe(String? dateString) {
+    if (dateString == null) return null;
+    try {
+      return DateTime.parse(dateString);
+    } catch (e) {
+      return null;
+    }
+  }
+
   void editTaskDateTime(int taskIndex) {
     final task = db.toDoList[taskIndex];
-    DateTime? currentDate;
-    TimeOfDay? currentTime;
-    
-    if (task['dueDate'] != null) {
-      try {
-        currentDate = DateTime.parse(task['dueDate']);
-      } catch (e) {
-        currentDate = null;
-      }
-    }
-    
-    if (task['dueTime'] != null) {
-      currentTime = _parseTimeOfDay(task['dueTime']);
-    }
+    DateTime? currentDate = _parseDateTimeSafe(task['dueDate']);
+    TimeOfDay? currentTime = _parseTimeOfDay(task['dueTime']);
     
     showDialog(
       context: context,
@@ -770,8 +767,8 @@ class _HomePageState extends State<HomePage> {
               taskCompleted: task['completed'] ?? false,
               taskColor: task['color'] ?? 'yellow',
               subNotes: task['subNotes'] ?? [],
-              dueDate: task['dueDate'] != null ? DateTime.parse(task['dueDate']) : null,
-              dueTime: task['dueTime'] != null ? _parseTimeOfDay(task['dueTime']) : null,
+              dueDate: _parseDateTimeSafe(task['dueDate']),
+              dueTime: _parseTimeOfDay(task['dueTime']),
               onChanged: (value) => checkBoxChanged(value, i),
               deleteFunction: (context) => deleteTask(i),
               onColorChanged: (color) => changeTaskColor(i, color),
@@ -815,8 +812,8 @@ class _HomePageState extends State<HomePage> {
                   taskCompleted: task['completed'] ?? false,
                   taskColor: task['color'] ?? 'yellow',
                   subNotes: task['subNotes'] ?? [],
-                  dueDate: task['dueDate'] != null ? DateTime.parse(task['dueDate']) : null,
-                  dueTime: task['dueTime'] != null ? _parseTimeOfDay(task['dueTime']) : null,
+                  dueDate: _parseDateTimeSafe(task['dueDate']),
+                  dueTime: _parseTimeOfDay(task['dueTime']),
                   onChanged: (value) => checkBoxChanged(value, i),
                   deleteFunction: (context) => deleteTask(i),
                   onColorChanged: (color) => changeTaskColor(i, color),
