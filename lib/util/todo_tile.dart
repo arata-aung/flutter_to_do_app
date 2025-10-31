@@ -16,9 +16,11 @@ class ToDoTile extends StatefulWidget {
   final Function(int, String)? onSubNoteColorChanged;
   final Function()? onMoveTask;
   final Function(int)? onMoveSubNote;
+  final Function(int, int)? onReorderSubNotes;
   final DateTime? dueDate;
   final TimeOfDay? dueTime;
   final Function()? onEditDateTime;
+  final String? recurrence;
 
   const ToDoTile({
     super.key,
@@ -35,9 +37,11 @@ class ToDoTile extends StatefulWidget {
     this.onSubNoteColorChanged,
     this.onMoveTask,
     this.onMoveSubNote,
+    this.onReorderSubNotes,
     this.dueDate,
     this.dueTime,
     this.onEditDateTime,
+    this.recurrence,
   });
 
   @override
@@ -88,28 +92,57 @@ class _ToDoTileState extends State<ToDoTile> {
   }
 
   Widget _buildDateTimeDisplay() {
-    if (widget.dueDate == null) {
+    if (widget.dueDate == null && widget.recurrence == null) {
       return const SizedBox.shrink();
     }
     
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
-    final taskDate = DateTime(widget.dueDate!.year, widget.dueDate!.month, widget.dueDate!.day);
-    final isOverdue = taskDate.isBefore(today) && !widget.taskCompleted;
-    final isToday = taskDate.isAtSameMomentAs(today);
+    DateTime? taskDate;
+    bool isOverdue = false;
+    bool isToday = false;
     
-    String dateText;
-    if (isToday) {
-      dateText = 'Today';
-    } else {
-      dateText = '${widget.dueDate!.month}/${widget.dueDate!.day}/${widget.dueDate!.year}';
+    if (widget.dueDate != null) {
+      taskDate = DateTime(widget.dueDate!.year, widget.dueDate!.month, widget.dueDate!.day);
+      isOverdue = taskDate.isBefore(today) && !widget.taskCompleted;
+      isToday = taskDate.isAtSameMomentAs(today);
     }
     
-    if (widget.dueTime != null) {
-      final period = widget.dueTime!.period == DayPeriod.am ? 'AM' : 'PM';
-      final hour = widget.dueTime!.hourOfPeriod == 0 ? 12 : widget.dueTime!.hourOfPeriod;
-      final minute = widget.dueTime!.minute.toString().padLeft(2, '0');
-      dateText += ', $hour:$minute $period';
+    String dateText = '';
+    if (widget.dueDate != null) {
+      if (isToday) {
+        dateText = 'Today';
+      } else {
+        dateText = '${widget.dueDate!.month}/${widget.dueDate!.day}/${widget.dueDate!.year}';
+      }
+      
+      if (widget.dueTime != null) {
+        final period = widget.dueTime!.period == DayPeriod.am ? 'AM' : 'PM';
+        final hour = widget.dueTime!.hourOfPeriod == 0 ? 12 : widget.dueTime!.hourOfPeriod;
+        final minute = widget.dueTime!.minute.toString().padLeft(2, '0');
+        dateText += ', $hour:$minute $period';
+      }
+    }
+    
+    // Add recurrence info
+    if (widget.recurrence != null) {
+      String recurrenceText = '';
+      switch (widget.recurrence) {
+        case 'daily':
+          recurrenceText = '🔁 Daily';
+          break;
+        case 'weekly':
+          recurrenceText = '🔁 Weekly';
+          break;
+        case 'monthly':
+          recurrenceText = '🔁 Monthly';
+          break;
+      }
+      if (dateText.isNotEmpty) {
+        dateText += ' - $recurrenceText';
+      } else {
+        dateText = recurrenceText;
+      }
     }
     
     return GestureDetector(
@@ -128,7 +161,7 @@ class _ToDoTileState extends State<ToDoTile> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
-              Icons.calendar_today,
+              widget.recurrence != null ? Icons.repeat : Icons.calendar_today,
               size: 14,
               color: isOverdue ? Colors.red.shade900 : Colors.black87,
             ),
@@ -147,8 +180,53 @@ class _ToDoTileState extends State<ToDoTile> {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
+  void _showTaskOptionsMenu(BuildContext context) {
+    // Show a popup menu with task options
+    showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: const Text('Task Options'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (widget.onEditDateTime != null)
+                ListTile(
+                  leading: Icon(Icons.calendar_month, color: Colors.purple.shade600),
+                  title: const Text('Edit Date & Time'),
+                  onTap: () {
+                    Navigator.of(dialogContext).pop();
+                    widget.onEditDateTime!();
+                  },
+                ),
+              ListTile(
+                leading: Icon(Icons.color_lens, color: Colors.blue.shade600),
+                title: const Text('Change Color'),
+                onTap: () {
+                  Navigator.of(dialogContext).pop();
+                  _showColorPicker(context);
+                },
+              ),
+              if (widget.onMoveTask != null)
+                ListTile(
+                  leading: Icon(Icons.drive_file_move, color: Colors.orange.shade600),
+                  title: const Text('Move to Group'),
+                  onTap: () {
+                    Navigator.of(dialogContext).pop();
+                    widget.onMoveTask!();
+                  },
+                ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _showColorPicker(BuildContext context) {
     // Helper function to build a color option
     Widget buildColorOption(BuildContext dialogContext, String colorName, Color color) {
       return GestureDetector(
@@ -173,6 +251,32 @@ class _ToDoTileState extends State<ToDoTile> {
       );
     }
 
+    showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: const Text('Choose Color'),
+          content: Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            children: availableColors
+                .map((colorData) => buildColorOption(
+                      dialogContext,
+                      colorData['name'] as String,
+                      colorData['color'] as Color,
+                    ))
+                .toList(),
+          ),
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final hasSubNotes = widget.subNotes != null && widget.subNotes!.isNotEmpty;
 
     return Padding(
@@ -183,55 +287,19 @@ class _ToDoTileState extends State<ToDoTile> {
             endActionPane: ActionPane(
               motion: const StretchMotion(),
               children: [
-                if (widget.onEditDateTime != null)
-                  SlidableAction(
-                    onPressed: (context) => widget.onEditDateTime!(),
-                    icon: Icons.calendar_month,
-                    backgroundColor: Colors.purple.shade300,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
                 SlidableAction(
-                  onPressed: (context) {
-                    // Show color picker dialog
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext dialogContext) {
-                        return AlertDialog(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          title: const Text('Choose Color'),
-                          content: Wrap(
-                            spacing: 10,
-                            runSpacing: 10,
-                            children: availableColors
-                                .map((colorData) => buildColorOption(
-                                      dialogContext,
-                                      colorData['name'] as String,
-                                      colorData['color'] as Color,
-                                    ))
-                                .toList(),
-                          ),
-                        );
-                      },
-                    );
-                  },
-                  icon: Icons.color_lens,
-                  backgroundColor: Colors.blue.shade300,
+                  onPressed: (context) => _showTaskOptionsMenu(context),
+                  icon: Icons.more_vert,
+                  backgroundColor: Colors.blue.shade400,
                   borderRadius: BorderRadius.circular(12),
+                  label: 'Options',
                 ),
-                if (widget.onMoveTask != null)
-                  SlidableAction(
-                    onPressed: (context) => widget.onMoveTask!(),
-                    icon: Icons.drive_file_move,
-                    backgroundColor: Colors.orange.shade300,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
                 SlidableAction(
                   onPressed: widget.deleteFunction,
                   icon: Icons.delete,
                   backgroundColor: Colors.red.shade300,
                   borderRadius: BorderRadius.circular(12),
+                  label: 'Delete',
                 )
               ],
             ),
@@ -349,6 +417,7 @@ class _ToDoTileState extends State<ToDoTile> {
               final subNoteColor = subNote['color'] ?? 'yellow';
               
               return Padding(
+                key: ValueKey('subnote_$index'),
                 padding: const EdgeInsets.only(left: 40, top: 8),
                 child: Container(
                   padding: const EdgeInsets.all(12),
@@ -369,6 +438,10 @@ class _ToDoTileState extends State<ToDoTile> {
                   ),
                   child: Row(
                     children: [
+                      if (widget.onReorderSubNotes != null) ...[
+                        Icon(Icons.drag_handle, color: Colors.grey[600], size: 18),
+                        const SizedBox(width: 8),
+                      ],
                       SizedBox(
                         width: 20,
                         height: 20,

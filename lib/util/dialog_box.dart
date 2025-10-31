@@ -4,10 +4,11 @@ import 'package:to_do_app/util/color_utils.dart';
 
 class DialogBox extends StatefulWidget {
   final TextEditingController controller;
-  final Function(String, DateTime?, TimeOfDay?) onSave;
+  final Function(String, DateTime?, TimeOfDay?, String?) onSave;
   final VoidCallback onCancel;
   final DateTime? initialDate;
   final TimeOfDay? initialTime;
+  final String? initialRecurrence;
 
   const DialogBox({
     super.key,
@@ -16,6 +17,7 @@ class DialogBox extends StatefulWidget {
     required this.onCancel,
     this.initialDate,
     this.initialTime,
+    this.initialRecurrence,
   });
 
   @override
@@ -26,12 +28,14 @@ class _DialogBoxState extends State<DialogBox> {
   String selectedColor = "yellow";
   DateTime? selectedDate;
   TimeOfDay? selectedTime;
+  String? selectedRecurrence;
 
   @override
   void initState() {
     super.initState();
     selectedDate = widget.initialDate;
     selectedTime = widget.initialTime;
+    selectedRecurrence = widget.initialRecurrence;
   }
 
   Future<void> _selectDate(BuildContext context) async {
@@ -202,13 +206,63 @@ class _DialogBoxState extends State<DialogBox> {
                     ),
                 ],
               ),
+            const SizedBox(height: 16),
+            const Text(
+              "Recurrence:",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              children: [
+                ChoiceChip(
+                  label: const Text('None'),
+                  selected: selectedRecurrence == null,
+                  onSelected: (selected) {
+                    setState(() {
+                      selectedRecurrence = null;
+                    });
+                  },
+                ),
+                ChoiceChip(
+                  label: const Text('Daily'),
+                  selected: selectedRecurrence == 'daily',
+                  onSelected: (selected) {
+                    setState(() {
+                      selectedRecurrence = 'daily';
+                    });
+                  },
+                ),
+                ChoiceChip(
+                  label: const Text('Weekly'),
+                  selected: selectedRecurrence == 'weekly',
+                  onSelected: (selected) {
+                    setState(() {
+                      selectedRecurrence = 'weekly';
+                    });
+                  },
+                ),
+                ChoiceChip(
+                  label: const Text('Monthly'),
+                  selected: selectedRecurrence == 'monthly',
+                  onSelected: (selected) {
+                    setState(() {
+                      selectedRecurrence = 'monthly';
+                    });
+                  },
+                ),
+              ],
+            ),
           ],
         ),
       ),
       actions: [
         MyButton(
           text: "Save",
-          onPressed: () => widget.onSave(selectedColor, selectedDate, selectedTime),
+          onPressed: () => widget.onSave(selectedColor, selectedDate, selectedTime, selectedRecurrence),
         ),
         MyButton(text: "Cancel", onPressed: widget.onCancel),
       ],

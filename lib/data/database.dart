@@ -32,6 +32,7 @@ class ToDoDatabase {
         "subNotes": [],
         "dueDate": null,
         "dueTime": null,
+        "recurrence": null,
       },
       {
         "name": "Do Exercise",
@@ -41,6 +42,7 @@ class ToDoDatabase {
         "subNotes": [],
         "dueDate": null,
         "dueTime": null,
+        "recurrence": null,
       },
     ];
   }
@@ -72,6 +74,7 @@ class ToDoDatabase {
             "subNotes": [],
             "dueDate": null,
             "dueTime": null,
+            "recurrence": null,
           };
         } else if (toDoList[i] is Map) {
           // Ensure all fields exist
@@ -87,6 +90,9 @@ class ToDoDatabase {
           }
           if (!item.containsKey("dueTime")) {
             item["dueTime"] = null;
+          }
+          if (!item.containsKey("recurrence")) {
+            item["recurrence"] = null;
           }
           
           // Migrate sub-notes to include color field
