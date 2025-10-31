@@ -60,7 +60,7 @@ class _HomePageState extends State<HomePage> {
         'groupIndex': selectedGroupIndex ?? (db.groups.isNotEmpty ? 0 : -1),
         'subNotes': [],
         'dueDate': dueDate?.toIso8601String(),
-        'dueTime': dueTime != null ? '${dueTime.hour}:${dueTime.minute.toString().padLeft(2, '0')}' : null,
+        'dueTime': dueTime != null ? _formatTimeOfDay(dueTime) : null,
       });
       _controller.clear();
     });
@@ -186,6 +186,10 @@ class _HomePageState extends State<HomePage> {
     } catch (e) {
       return null;
     }
+  }
+
+  String _formatTimeOfDay(TimeOfDay time) {
+    return '${time.hour}:${time.minute.toString().padLeft(2, '0')}';
   }
 
   void editTaskDateTime(int taskIndex) {
@@ -314,7 +318,7 @@ class _HomePageState extends State<HomePage> {
                     setState(() {
                       db.toDoList[taskIndex]['dueDate'] = selectedDate?.toIso8601String();
                       db.toDoList[taskIndex]['dueTime'] = selectedTime != null 
-                          ? '${selectedTime!.hour}:${selectedTime!.minute.toString().padLeft(2, '0')}' 
+                          ? _formatTimeOfDay(selectedTime!) 
                           : null;
                     });
                     db.updateDatabase();
