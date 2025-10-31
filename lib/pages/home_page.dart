@@ -446,6 +446,12 @@ class _HomePageState extends State<HomePage> {
       builder: (context) {
         return StatefulBuilder(
           builder: (context, setDialogState) {
+            // Helper to update both dialog and parent state
+            void updateBothStates(Function() updates) {
+              setDialogState(updates);
+              setState(updates);
+            }
+            
             return AlertDialog(
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
@@ -468,24 +474,21 @@ class _HomePageState extends State<HomePage> {
                           label: const Text('All'),
                           selected: _filterStatus == 'all',
                           onSelected: (selected) {
-                            setDialogState(() => _filterStatus = 'all');
-                            setState(() => _filterStatus = 'all');
+                            updateBothStates(() => _filterStatus = 'all');
                           },
                         ),
                         ChoiceChip(
                           label: const Text('Completed'),
                           selected: _filterStatus == 'completed',
                           onSelected: (selected) {
-                            setDialogState(() => _filterStatus = 'completed');
-                            setState(() => _filterStatus = 'completed');
+                            updateBothStates(() => _filterStatus = 'completed');
                           },
                         ),
                         ChoiceChip(
                           label: const Text('Incomplete'),
                           selected: _filterStatus == 'incomplete',
                           onSelected: (selected) {
-                            setDialogState(() => _filterStatus = 'incomplete');
-                            setState(() => _filterStatus = 'incomplete');
+                            updateBothStates(() => _filterStatus = 'incomplete');
                           },
                         ),
                       ],
@@ -504,8 +507,7 @@ class _HomePageState extends State<HomePage> {
                           label: const Text('All'),
                           selected: _filterColor == null,
                           onSelected: (selected) {
-                            setDialogState(() => _filterColor = null);
-                            setState(() => _filterColor = null);
+                            updateBothStates(() => _filterColor = null);
                           },
                         ),
                         ...[
@@ -515,8 +517,7 @@ class _HomePageState extends State<HomePage> {
                               label: Text(color[0].toUpperCase() + color.substring(1)),
                               selected: _filterColor == color,
                               onSelected: (selected) {
-                                setDialogState(() => _filterColor = color);
-                                setState(() => _filterColor = color);
+                                updateBothStates(() => _filterColor = color);
                               },
                             )),
                       ],
@@ -534,24 +535,21 @@ class _HomePageState extends State<HomePage> {
                           label: const Text('None'),
                           selected: _sortBy == 'none',
                           onSelected: (selected) {
-                            setDialogState(() => _sortBy = 'none');
-                            setState(() => _sortBy = 'none');
+                            updateBothStates(() => _sortBy = 'none');
                           },
                         ),
                         ChoiceChip(
                           label: const Text('Name'),
                           selected: _sortBy == 'name',
                           onSelected: (selected) {
-                            setDialogState(() => _sortBy = 'name');
-                            setState(() => _sortBy = 'name');
+                            updateBothStates(() => _sortBy = 'name');
                           },
                         ),
                         ChoiceChip(
                           label: const Text('Status'),
                           selected: _sortBy == 'completed',
                           onSelected: (selected) {
-                            setDialogState(() => _sortBy = 'completed');
-                            setState(() => _sortBy = 'completed');
+                            updateBothStates(() => _sortBy = 'completed');
                           },
                         ),
                       ],
@@ -563,12 +561,7 @@ class _HomePageState extends State<HomePage> {
                 TextButton(
                   onPressed: () {
                     // Reset filters
-                    setDialogState(() {
-                      _filterStatus = 'all';
-                      _filterColor = null;
-                      _sortBy = 'none';
-                    });
-                    setState(() {
+                    updateBothStates(() {
                       _filterStatus = 'all';
                       _filterColor = null;
                       _sortBy = 'none';

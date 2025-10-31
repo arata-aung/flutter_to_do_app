@@ -365,7 +365,7 @@ class _ToDoTileState extends State<ToDoTile> {
                         ),
                       if (widget.onMoveSubNote != null)
                         IconButton(
-                          icon: const Icon(Icons.move_up, size: 18),
+                          icon: const Icon(Icons.drive_file_move, size: 18),
                           onPressed: () => widget.onMoveSubNote!(index),
                           padding: EdgeInsets.zero,
                           constraints: const BoxConstraints(),
