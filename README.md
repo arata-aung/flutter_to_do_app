@@ -16,12 +16,14 @@ A modern Flutter to-do list application with groups, sub-notes, and beautiful UI
 - Delete tasks with swipe gesture
 - **Date & Time** - Set due dates and times for tasks (similar to Google Tasks)
 - **Overdue indicators** - Visual highlighting for overdue tasks
+- **Recurrence** - Set tasks to repeat daily, weekly, or monthly (automatically creates new task when completed)
 - **Sub-notes** - Add one level of sub-tasks to any task
 - Assign tasks to groups
 - **Customize task colors** - Choose from 10 different colors for each task
 - **Move tasks between groups** - Easily reorganize tasks across different groups
 - **Move sub-notes between tasks** - Transfer sub-notes from one task to another
 - **Customize sub-note colors** - Each sub-note can have its own color
+- **Drag and drop** - Reorder tasks when no groups exist
 - **Filter & Sort** - Filter by status or color, sort by name or completion status
 
 ### 🎨 Modern UI
@@ -68,7 +70,8 @@ A modern Flutter to-do list application with groups, sub-notes, and beautiful UI
 4. Select a color from the color picker
 5. (Optional) Set a due date by tapping "Select Date"
 6. (Optional) If date is set, you can also set a time by tapping "Select Time"
-7. Tap "Save"
+7. (Optional) Set a recurrence pattern: None, Daily, Weekly, or Monthly
+8. Tap "Save"
 
 **Add Sub-notes:**
 1. Click the + button on any task
@@ -84,25 +87,33 @@ A modern Flutter to-do list application with groups, sub-notes, and beautiful UI
 - If a task has sub-notes, a badge shows the count
 - Tap the expand/collapse icon to show or hide sub-notes
 
-**Set or Edit Due Date & Time:**
-1. Swipe left on any task
-2. Tap the calendar icon (📅)
+**Edit Task Options:**
+1. Swipe left on any task to reveal action buttons
+2. Tap the "Options" button (⋮) to see:
+   - Edit Date & Time
+   - Change Color
+   - Move to Group (if multiple groups exist)
+3. Or tap the "Delete" button to remove the task
+
+**Set or Edit Due Date, Time & Recurrence:**
+1. Use the "Options" menu and select "Edit Date & Time", or
+2. Tap directly on the displayed date/time indicator on the task
 3. Select a due date from the calendar picker
 4. (Optional) Select a time from the time picker
-5. Tap "Save"
-6. To clear date/time, tap the X button next to the date or time field
+5. (Optional) Set recurrence: None, Daily, Weekly, or Monthly
+6. Tap "Save"
+7. To clear date/time, tap the X button next to the date or time field
 
-**View Due Dates:**
+**View Due Dates and Recurrence:**
 - Tasks with due dates show a calendar icon and date below the task name
 - Tasks due today are labeled "Today"
 - **Overdue tasks** are highlighted with a red background and border
-- You can also tap directly on the displayed date/time to edit it
+- Recurring tasks show a repeat icon (🔁) with the recurrence pattern
+- When you complete a recurring task, a new instance is automatically created with the next due date
 
-**Change Task Color:**
-1. Swipe left on any existing task
-2. Tap the color lens icon (🎨)
-3. Select a new color from the color picker
-4. The task color updates immediately
+**Reorder Tasks:**
+- When no groups exist, long-press and drag tasks to reorder them
+- Sub-notes show a drag handle icon (☰) indicating they can be reordered
 
 **Delete a Task:**
 1. Swipe left on the task
