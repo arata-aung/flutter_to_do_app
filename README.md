@@ -17,6 +17,10 @@ A modern Flutter to-do list application with groups, sub-notes, and beautiful UI
 - **Sub-notes** - Add one level of sub-tasks to any task
 - Assign tasks to groups
 - **Customize task colors** - Choose from 10 different colors for each task
+- **Move tasks between groups** - Easily reorganize tasks across different groups
+- **Move sub-notes between tasks** - Transfer sub-notes from one task to another
+- **Customize sub-note colors** - Each sub-note can have its own color
+- **Filter & Sort** - Filter by status or color, sort by name or completion status
 
 ### 🎨 Modern UI
 - Material Design 3 principles
@@ -89,6 +93,32 @@ A modern Flutter to-do list application with groups, sub-notes, and beautiful UI
 **Delete a Sub-note:**
 1. Expand the task to show sub-notes
 2. Click the X button on the sub-note you want to remove
+
+**Move Task Between Groups:**
+1. Swipe left on any task (when multiple groups exist)
+2. Tap the move icon (📁)
+3. Select the target group from the dialog
+4. Task moves to the selected group
+
+**Move Sub-note to Another Task:**
+1. Expand the task to show sub-notes
+2. Click the move up icon (↑) on the sub-note
+3. Select the target task from the dialog
+4. Sub-note moves to the selected task
+
+**Change Sub-note Color:**
+1. Expand the task to show sub-notes
+2. Click the palette icon (🎨) on any sub-note
+3. Select a new color from the color picker
+4. The sub-note color updates immediately
+
+**Filter & Sort Tasks:**
+1. Tap the filter icon in the app bar (top right)
+2. Select status filter: All, Completed, or Incomplete
+3. Select color filter: All or specific color
+4. Select sort option: None, Name (alphabetical), or Status (incomplete first)
+5. Active filters show a red indicator on the filter icon
+6. Tap "Reset" to clear all filters and sorting
 
 ### Available Colors
 - Yellow
