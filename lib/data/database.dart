@@ -76,6 +76,21 @@ class ToDoDatabase {
           if (!item.containsKey("groupIndex")) {
             item["groupIndex"] = groups.isNotEmpty ? 0 : -1;
           }
+          
+          // Migrate sub-notes to include color field
+          if (item.containsKey("subNotes") && item["subNotes"] is List) {
+            List subNotes = item["subNotes"];
+            for (int j = 0; j < subNotes.length; j++) {
+              if (subNotes[j] is Map) {
+                var subNote = Map<String, dynamic>.from(subNotes[j]);
+                if (!subNote.containsKey("color")) {
+                  subNote["color"] = "yellow";  // Default color for sub-notes
+                }
+                subNotes[j] = subNote;
+              }
+            }
+          }
+          
           toDoList[i] = item;
         }
       }

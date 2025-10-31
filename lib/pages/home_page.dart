@@ -137,6 +137,7 @@ class _HomePageState extends State<HomePage> {
       db.toDoList[taskIndex]['subNotes'].add({
         'name': subNoteName,
         'completed': false,
+        'color': 'yellow',  // Default color for new sub-notes
       });
     });
     db.updateDatabase();
@@ -152,6 +153,31 @@ class _HomePageState extends State<HomePage> {
   void deleteSubNote(int taskIndex, int subNoteIndex) {
     setState(() {
       db.toDoList[taskIndex]['subNotes'].removeAt(subNoteIndex);
+    });
+    db.updateDatabase();
+  }
+
+  void changeSubNoteColor(int taskIndex, int subNoteIndex, String newColor) {
+    setState(() {
+      if (db.toDoList[taskIndex]['subNotes'][subNoteIndex] is Map) {
+        db.toDoList[taskIndex]['subNotes'][subNoteIndex]['color'] = newColor;
+      }
+    });
+    db.updateDatabase();
+  }
+
+  void moveTaskToGroup(int taskIndex, int targetGroupIndex) {
+    setState(() {
+      db.toDoList[taskIndex]['groupIndex'] = targetGroupIndex;
+    });
+    db.updateDatabase();
+  }
+
+  void moveSubNoteToTask(int sourceTaskIndex, int subNoteIndex, int targetTaskIndex) {
+    setState(() {
+      var subNote = db.toDoList[sourceTaskIndex]['subNotes'][subNoteIndex];
+      db.toDoList[sourceTaskIndex]['subNotes'].removeAt(subNoteIndex);
+      db.toDoList[targetTaskIndex]['subNotes'].add(subNote);
     });
     db.updateDatabase();
   }
@@ -262,6 +288,113 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  void showMoveTaskDialog(int taskIndex) {
+    if (db.groups.length <= 1) {
+      // Need at least 2 groups to move
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Create more groups to move tasks between them'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+      return;
+    }
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: const Text('Move Task to Group'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ...db.groups.asMap().entries.map((entry) {
+                final idx = entry.key;
+                final group = entry.value;
+                final currentGroupIndex = db.toDoList[taskIndex]['groupIndex'];
+                
+                if (idx == currentGroupIndex) {
+                  return const SizedBox.shrink();
+                }
+                
+                return ListTile(
+                  title: Text(group['name']),
+                  leading: const Icon(Icons.folder),
+                  onTap: () {
+                    moveTaskToGroup(taskIndex, idx);
+                    Navigator.of(context).pop();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Task moved to ${group['name']}'),
+                        duration: const Duration(seconds: 2),
+                      ),
+                    );
+                  },
+                );
+              }).toList(),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void showMoveSubNoteDialog(int sourceTaskIndex, int subNoteIndex) {
+    final eligibleTasks = db.toDoList.asMap().entries.where(
+      (entry) => entry.key != sourceTaskIndex,
+    ).toList();
+
+    if (eligibleTasks.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Create more tasks to move sub-notes between them'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+      return;
+    }
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: const Text('Move Sub-note to Task'),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: ListView(
+              shrinkWrap: true,
+              children: eligibleTasks.map((entry) {
+                final idx = entry.key;
+                final task = entry.value;
+                
+                return ListTile(
+                  title: Text(task['name']),
+                  leading: const Icon(Icons.task),
+                  onTap: () {
+                    moveSubNoteToTask(sourceTaskIndex, subNoteIndex, idx);
+                    Navigator.of(context).pop();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Sub-note moved to ${task['name']}'),
+                        duration: const Duration(seconds: 2),
+                      ),
+                    );
+                  },
+                );
+              }).toList(),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   void _logout() async {
     await _authService.logout();
     if (mounted) {
@@ -295,6 +428,9 @@ class _HomePageState extends State<HomePage> {
               onAddSubNote: (subNote) => addSubNote(i, subNote),
               onSubNoteChanged: (subIdx, completed) => toggleSubNote(i, subIdx, completed),
               onDeleteSubNote: (subIdx) => deleteSubNote(i, subIdx),
+              onSubNoteColorChanged: (subIdx, color) => changeSubNoteColor(i, subIdx, color),
+              onMoveTask: null,  // No groups, can't move
+              onMoveSubNote: (subIdx) => showMoveSubNoteDialog(i, subIdx),
             ),
           );
         }
@@ -333,6 +469,9 @@ class _HomePageState extends State<HomePage> {
                     onAddSubNote: (subNote) => addSubNote(i, subNote),
                     onSubNoteChanged: (subIdx, completed) => toggleSubNote(i, subIdx, completed),
                     onDeleteSubNote: (subIdx) => deleteSubNote(i, subIdx),
+                    onSubNoteColorChanged: (subIdx, color) => changeSubNoteColor(i, subIdx, color),
+                    onMoveTask: () => showMoveTaskDialog(i),
+                    onMoveSubNote: (subIdx) => showMoveSubNoteDialog(i, subIdx),
                   ),
                 );
               }
