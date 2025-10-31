@@ -438,10 +438,10 @@ class _ToDoTileState extends State<ToDoTile> {
                   ),
                   child: Row(
                     children: [
-                      if (widget.onReorderSubNotes != null)
+                      if (widget.onReorderSubNotes != null) ...[
                         Icon(Icons.drag_handle, color: Colors.grey[600], size: 18),
-                      if (widget.onReorderSubNotes != null)
                         const SizedBox(width: 8),
+                      ],
                       SizedBox(
                         width: 20,
                         height: 20,

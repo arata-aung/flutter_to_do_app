@@ -47,8 +47,8 @@ class _HomePageState extends State<HomePage> {
       final wasCompleted = task['completed'] ?? false;
       task['completed'] = !wasCompleted;
       
-      // Handle recurring tasks
-      if (!wasCompleted && task['recurrence'] != null) {
+      // Handle recurring tasks - only when task is being marked as completed
+      if (wasCompleted == false && task['completed'] == true && task['recurrence'] != null) {
         // Task was just completed and has recurrence - create a new instance
         final recurrence = task['recurrence'];
         DateTime? currentDate = _parseDateTimeSafe(task['dueDate']);
@@ -63,12 +63,18 @@ class _HomePageState extends State<HomePage> {
               newDate = currentDate.add(const Duration(days: 7));
               break;
             case 'monthly':
-              // Add one month (handling different month lengths)
-              newDate = DateTime(
-                currentDate.year,
-                currentDate.month + 1,
-                currentDate.day,
-              );
+              // Add one month with proper handling of month-end dates
+              // If the day doesn't exist in the target month, use the last day of that month
+              int targetMonth = currentDate.month + 1;
+              int targetYear = currentDate.year;
+              if (targetMonth > 12) {
+                targetMonth = 1;
+                targetYear++;
+              }
+              // Get the last day of the target month
+              int lastDayOfTargetMonth = DateTime(targetYear, targetMonth + 1, 0).day;
+              int targetDay = currentDate.day > lastDayOfTargetMonth ? lastDayOfTargetMonth : currentDate.day;
+              newDate = DateTime(targetYear, targetMonth, targetDay);
               break;
             default:
               newDate = currentDate;
@@ -1114,29 +1120,32 @@ class _HomePageState extends State<HomePage> {
                 ],
               ),
             )
-          : ReorderableListView(
-              padding: const EdgeInsets.only(bottom: 100, top: 20),
-              onReorder: (oldIndex, newIndex) {
-                // Simple reordering - this is a simplified approach
-                // In a real implementation, you'd need more sophisticated logic
-                // to handle group vs task reordering separately
-                setState(() {
-                  if (db.groups.isEmpty) {
-                    // Reorder tasks
-                    if (newIndex > oldIndex) {
-                      newIndex -= 1;
+          : db.groups.isEmpty
+              ? ReorderableListView(
+                  padding: const EdgeInsets.only(bottom: 100, top: 20),
+                  onReorder: (oldIndex, newIndex) {
+                    // Reorder tasks when no groups exist
+                    setState(() {
+                      if (newIndex > oldIndex) {
+                        newIndex -= 1;
+                      }
+                      final task = db.toDoList.removeAt(oldIndex);
+                      db.toDoList.insert(newIndex, task);
+                      db.updateDatabase();
+                    });
+                  },
+                  children: buildTaskList(),
+                )
+              : ListView(
+                  padding: const EdgeInsets.only(bottom: 100, top: 20),
+                  children: buildTaskList().map((widget) {
+                    // Remove ReorderableDragStartListener wrapper when groups exist
+                    if (widget is ReorderableDragStartListener) {
+                      return widget.child;
                     }
-                    final task = db.toDoList.removeAt(oldIndex);
-                    db.toDoList.insert(newIndex, task);
-                  } else {
-                    // More complex logic needed for mixed groups and tasks
-                    // For now, we'll just prevent reordering when groups exist
-                  }
-                  db.updateDatabase();
-                });
-              },
-              children: buildTaskList(),
-            ),
+                    return widget;
+                  }).toList(),
+                ),
     );
   }
 }
