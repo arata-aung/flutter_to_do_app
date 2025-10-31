@@ -7,6 +7,7 @@ import 'package:to_do_app/util/dialog_box.dart';
 import 'package:to_do_app/util/todo_tile.dart';
 import 'package:to_do_app/util/group_tile.dart';
 import 'package:to_do_app/util/group_dialog.dart';
+import 'package:to_do_app/util/color_utils.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -510,10 +511,7 @@ class _HomePageState extends State<HomePage> {
                             updateBothStates(() => _filterColor = null);
                           },
                         ),
-                        ...[
-                          'yellow', 'red', 'blue', 'green', 'orange',
-                          'purple', 'pink', 'teal', 'cyan', 'amber'
-                        ].map((color) => ChoiceChip(
+                        ...getAvailableColorNames().map((color) => ChoiceChip(
                               label: Text(color[0].toUpperCase() + color.substring(1)),
                               selected: _filterColor == color,
                               onSelected: (selected) {
