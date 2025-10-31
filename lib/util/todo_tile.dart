@@ -88,6 +88,10 @@ class _ToDoTileState extends State<ToDoTile> {
   }
 
   Widget _buildDateTimeDisplay() {
+    if (widget.dueDate == null) {
+      return const SizedBox.shrink();
+    }
+    
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final taskDate = DateTime(widget.dueDate!.year, widget.dueDate!.month, widget.dueDate!.day);

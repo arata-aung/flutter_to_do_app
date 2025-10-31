@@ -60,7 +60,7 @@ class _HomePageState extends State<HomePage> {
         'groupIndex': selectedGroupIndex ?? (db.groups.isNotEmpty ? 0 : -1),
         'subNotes': [],
         'dueDate': dueDate?.toIso8601String(),
-        'dueTime': dueTime != null ? '${dueTime.hour}:${dueTime.minute}' : null,
+        'dueTime': dueTime != null ? '${dueTime.hour}:${dueTime.minute.toString().padLeft(2, '0')}' : null,
       });
       _controller.clear();
     });
@@ -176,12 +176,16 @@ class _HomePageState extends State<HomePage> {
 
   TimeOfDay? _parseTimeOfDay(String? timeString) {
     if (timeString == null) return null;
-    final parts = timeString.split(':');
-    if (parts.length != 2) return null;
-    return TimeOfDay(
-      hour: int.parse(parts[0]),
-      minute: int.parse(parts[1]),
-    );
+    try {
+      final parts = timeString.split(':');
+      if (parts.length != 2) return null;
+      final hour = int.parse(parts[0]);
+      final minute = int.parse(parts[1]);
+      if (hour < 0 || hour > 23 || minute < 0 || minute > 59) return null;
+      return TimeOfDay(hour: hour, minute: minute);
+    } catch (e) {
+      return null;
+    }
   }
 
   void editTaskDateTime(int taskIndex) {
@@ -190,15 +194,15 @@ class _HomePageState extends State<HomePage> {
     TimeOfDay? currentTime;
     
     if (task['dueDate'] != null) {
-      currentDate = DateTime.parse(task['dueDate']);
+      try {
+        currentDate = DateTime.parse(task['dueDate']);
+      } catch (e) {
+        currentDate = null;
+      }
     }
     
     if (task['dueTime'] != null) {
-      final timeParts = task['dueTime'].split(':');
-      currentTime = TimeOfDay(
-        hour: int.parse(timeParts[0]),
-        minute: int.parse(timeParts[1]),
-      );
+      currentTime = _parseTimeOfDay(task['dueTime']);
     }
     
     showDialog(
@@ -310,7 +314,7 @@ class _HomePageState extends State<HomePage> {
                     setState(() {
                       db.toDoList[taskIndex]['dueDate'] = selectedDate?.toIso8601String();
                       db.toDoList[taskIndex]['dueTime'] = selectedTime != null 
-                          ? '${selectedTime!.hour}:${selectedTime!.minute}' 
+                          ? '${selectedTime!.hour}:${selectedTime!.minute.toString().padLeft(2, '0')}' 
                           : null;
                     });
                     db.updateDatabase();
