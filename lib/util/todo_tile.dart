@@ -16,6 +16,9 @@ class ToDoTile extends StatefulWidget {
   final Function(int, String)? onSubNoteColorChanged;
   final Function()? onMoveTask;
   final Function(int)? onMoveSubNote;
+  final DateTime? dueDate;
+  final TimeOfDay? dueTime;
+  final Function()? onEditDateTime;
 
   const ToDoTile({
     super.key,
@@ -32,6 +35,9 @@ class ToDoTile extends StatefulWidget {
     this.onSubNoteColorChanged,
     this.onMoveTask,
     this.onMoveSubNote,
+    this.dueDate,
+    this.dueTime,
+    this.onEditDateTime,
   });
 
   @override
@@ -81,6 +87,62 @@ class _ToDoTileState extends State<ToDoTile> {
     );
   }
 
+  Widget _buildDateTimeDisplay() {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final taskDate = DateTime(widget.dueDate!.year, widget.dueDate!.month, widget.dueDate!.day);
+    final isOverdue = taskDate.isBefore(today) && !widget.taskCompleted;
+    final isToday = taskDate.isAtSameMomentAs(today);
+    
+    String dateText;
+    if (isToday) {
+      dateText = 'Today';
+    } else {
+      dateText = '${widget.dueDate!.month}/${widget.dueDate!.day}/${widget.dueDate!.year}';
+    }
+    
+    if (widget.dueTime != null) {
+      final period = widget.dueTime!.period == DayPeriod.am ? 'AM' : 'PM';
+      final hour = widget.dueTime!.hourOfPeriod == 0 ? 12 : widget.dueTime!.hourOfPeriod;
+      final minute = widget.dueTime!.minute.toString().padLeft(2, '0');
+      dateText += ', $hour:$minute $period';
+    }
+    
+    return GestureDetector(
+      onTap: widget.onEditDateTime,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          color: isOverdue ? Colors.red.shade100 : Colors.white.withOpacity(0.5),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: isOverdue ? Colors.red.shade700 : Colors.black45,
+            width: 1,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.calendar_today,
+              size: 14,
+              color: isOverdue ? Colors.red.shade900 : Colors.black87,
+            ),
+            const SizedBox(width: 4),
+            Text(
+              dateText,
+              style: TextStyle(
+                fontSize: 13,
+                color: isOverdue ? Colors.red.shade900 : Colors.black87,
+                fontWeight: isOverdue ? FontWeight.bold : FontWeight.normal,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     // Helper function to build a color option
@@ -117,6 +179,13 @@ class _ToDoTileState extends State<ToDoTile> {
             endActionPane: ActionPane(
               motion: const StretchMotion(),
               children: [
+                if (widget.onEditDateTime != null)
+                  SlidableAction(
+                    onPressed: (context) => widget.onEditDateTime!(),
+                    icon: Icons.calendar_month,
+                    backgroundColor: Colors.purple.shade300,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 SlidableAction(
                   onPressed: (context) {
                     // Show color picker dialog
@@ -201,16 +270,25 @@ class _ToDoTileState extends State<ToDoTile> {
                         ),
                         const SizedBox(width: 12),
                         Expanded(
-                          child: Text(
-                            widget.taskName,
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                              decoration: widget.taskCompleted
-                                  ? TextDecoration.lineThrough
-                                  : TextDecoration.none,
-                              color: Colors.black87,
-                            ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                widget.taskName,
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                  decoration: widget.taskCompleted
+                                      ? TextDecoration.lineThrough
+                                      : TextDecoration.none,
+                                  color: Colors.black87,
+                                ),
+                              ),
+                              if (widget.dueDate != null) ...[
+                                const SizedBox(height: 4),
+                                _buildDateTimeDisplay(),
+                              ],
+                            ],
                           ),
                         ),
                         if (hasSubNotes)

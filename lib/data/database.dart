@@ -30,6 +30,8 @@ class ToDoDatabase {
         "color": "yellow",
         "groupIndex": 0,
         "subNotes": [],
+        "dueDate": null,
+        "dueTime": null,
       },
       {
         "name": "Do Exercise",
@@ -37,6 +39,8 @@ class ToDoDatabase {
         "color": "yellow",
         "groupIndex": 0,
         "subNotes": [],
+        "dueDate": null,
+        "dueTime": null,
       },
     ];
   }
@@ -66,6 +70,8 @@ class ToDoDatabase {
             "color": oldItem.length > 2 ? oldItem[2] : "yellow",
             "groupIndex": 0, // Assign to first group or -1 if no groups
             "subNotes": [],
+            "dueDate": null,
+            "dueTime": null,
           };
         } else if (toDoList[i] is Map) {
           // Ensure all fields exist
@@ -75,6 +81,12 @@ class ToDoDatabase {
           }
           if (!item.containsKey("groupIndex")) {
             item["groupIndex"] = groups.isNotEmpty ? 0 : -1;
+          }
+          if (!item.containsKey("dueDate")) {
+            item["dueDate"] = null;
+          }
+          if (!item.containsKey("dueTime")) {
+            item["dueTime"] = null;
           }
           
           // Migrate sub-notes to include color field
