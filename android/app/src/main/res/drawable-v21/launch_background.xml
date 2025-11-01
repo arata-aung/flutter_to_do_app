@@ -1,12 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Modify this file to customize your launch splash screen -->
+<!-- Custom splash screen for To-Do App (API 21+) -->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:drawable="?android:colorBackground" />
+    <!-- Background gradient -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:angle="135"
+                android:startColor="#FFF9C4"
+                android:centerColor="#FFEB3B"
+                android:endColor="#FBC02D"
+                android:type="linear" />
+        </shape>
+    </item>
 
-    <!-- You can insert your own image assets here -->
-    <!-- <item>
+    <!-- App branding text/icon can be added here -->
+    <item>
         <bitmap
             android:gravity="center"
-            android:src="@mipmap/launch_image" />
-    </item> -->
+            android:src="@drawable/splash_icon" />
+    </item>
 </layer-list>
