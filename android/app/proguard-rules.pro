@@ -8,5 +8,7 @@
 -dontwarn io.flutter.embedding.**
 
 ## Hive
--keep class * extends com.hive.** { *; }
--keepclassmembers class * extends com.hive.** { *; }
+-keep class hive.** { *; }
+-keep class * extends hive.HiveObject { *; }
+-keep class **$HiveFieldAdapter { *; }
+-keepclassmembers class * extends hive.HiveObject { *; }

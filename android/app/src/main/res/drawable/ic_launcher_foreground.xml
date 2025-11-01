@@ -10,12 +10,10 @@
         android:translateX="54"
         android:translateY="54">
         
-        <!-- White background circle -->
+        <!-- White background circle - creates the white badge for the icon -->
         <path
             android:fillColor="#FFFFFF"
-            android:pathData="M-20,-20 A28,28 0 1,1 -20,20 A28,28 0 1,1 -20,-20 Z
-                         M20,-20 A28,28 0 1,1 20,20 A28,28 0 1,1 20,-20 Z
-                         M0,-25 A30,30 0 1,1 0,25 A30,30 0 1,1 0,-25 Z" />
+            android:pathData="M0,-25 A30,30 0 1,1 0,25 A30,30 0 1,1 0,-25 Z" />
         
         <!-- Checkmark -->
         <path
