@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- To-Do App splash icon - optimized -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="100dp"
+    android:height="100dp"
+    android:viewportWidth="100"
+    android:viewportHeight="100">
+    
+    <!-- White background circle -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M50,15 A35,35 0 1,1 50,85 A35,35 0 1,1 50,15 Z" />
+    
+    <!-- Checkmark icon -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeWidth="4"
+        android:strokeColor="#FBC02D"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M35,50 L45,60 L65,37" />
+    
+    <!-- List line (top) -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeWidth="2"
+        android:strokeColor="#FBC02D"
+        android:strokeLineCap="round"
+        android:pathData="M32,30 L68,30" />
+    
+    <!-- List line (bottom) -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeWidth="2"
+        android:strokeColor="#FBC02D"
+        android:strokeLineCap="round"
+        android:pathData="M32,70 L68,70" />
+</vector>
