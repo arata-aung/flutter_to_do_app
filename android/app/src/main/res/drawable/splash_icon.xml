@@ -1,47 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- To-Do App splash icon -->
+<!-- To-Do App splash icon - optimized -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="200dp"
-    android:height="200dp"
-    android:viewportWidth="200"
-    android:viewportHeight="200">
+    android:width="100dp"
+    android:height="100dp"
+    android:viewportWidth="100"
+    android:viewportHeight="100">
     
-    <!-- Background circle with shadow effect -->
+    <!-- White background circle -->
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M100,30 A70,70 0 1,1 100,170 A70,70 0 1,1 100,30 Z" />
+        android:pathData="M50,15 A35,35 0 1,1 50,85 A35,35 0 1,1 50,15 Z" />
     
     <!-- Checkmark icon -->
     <path
-        android:fillColor="#FBC02D"
-        android:strokeWidth="8"
+        android:fillColor="@android:color/transparent"
+        android:strokeWidth="4"
         android:strokeColor="#FBC02D"
         android:strokeLineCap="round"
         android:strokeLineJoin="round"
-        android:pathData="M70,100 L90,120 L130,75" />
+        android:pathData="M35,50 L45,60 L65,37" />
     
-    <!-- List lines -->
+    <!-- List line (top) -->
     <path
         android:fillColor="@android:color/transparent"
-        android:strokeWidth="4"
+        android:strokeWidth="2"
         android:strokeColor="#FBC02D"
         android:strokeLineCap="round"
-        android:pathData="M65,60 L135,60" />
+        android:pathData="M32,30 L68,30" />
     
+    <!-- List line (bottom) -->
     <path
         android:fillColor="@android:color/transparent"
-        android:strokeWidth="4"
+        android:strokeWidth="2"
         android:strokeColor="#FBC02D"
         android:strokeLineCap="round"
-        android:pathData="M65,140 L135,140" />
-    
-    <!-- Text "To-Do" -->
-    <group>
-        <path
-            android:fillColor="#37474F"
-            android:pathData="M85,185 L90,185 L90,195 L95,195 L95,185 L100,185 L100,180 L85,180 Z" />
-        <path
-            android:fillColor="#37474F"
-            android:pathData="M105,180 Q105,180 105,187.5 Q105,195 112.5,195 Q120,195 120,187.5 Q120,180 112.5,180 Q105,180 105,180 Z M112.5,185 Q115,185 115,187.5 Q115,190 112.5,190 Q110,190 110,187.5 Q110,185 112.5,185 Z" />
-    </group>
+        android:pathData="M32,70 L68,70" />
 </vector>
