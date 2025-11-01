@@ -207,7 +207,8 @@ class _ToDoTileState extends State<ToDoTile> {
                 title: const Text('Change Color'),
                 onTap: () {
                   Navigator.of(dialogContext).pop();
-                  _showColorPicker(dialogContext);
+                  // Use the parent context to show the color picker after closing the options dialog
+                  _showColorPicker(context);
                 },
               ),
               if (widget.onMoveTask != null)
